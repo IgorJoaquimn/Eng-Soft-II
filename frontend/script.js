@@ -1,7 +1,12 @@
 // Select DOM elements
 const form = document.getElementById('textForm');
 const textArea = document.getElementById('largeText');
+const fileInput = document.getElementById('fileUpload');
+const submitButton = document.getElementById('submitButton');
 const responseMessage = document.getElementById('responseMessage');
+
+const MAX_TEXT_LENGTH = 5000; // Example: 5000 characters max
+const MIN_TEXT_LENGTH = 0;
 
 // Mock data for demonstration
 const mockData = [
@@ -10,8 +15,57 @@ const mockData = [
     { id: 3, name: "Alice Johnson", age: 35 }
 ];
 
-// Event listener for form submission
-form.addEventListener('submit', handleSubmit);
+/**
+ * Checks if the input is empty (no text and no file)
+ * @returns {boolean}
+ */
+function isInputEmpty() {
+    const text = textArea.value.trim();
+    const file = fileInput.files[0];
+
+    return text.length === 0 && !file;
+}
+
+/**
+ * Validates text input length
+ * @returns {boolean}
+ */
+function validateTextLength() {
+    const text = textArea.value.trim();
+    return text.length > 0 && text.length <= MAX_TEXT_LENGTH;
+}
+
+/**
+ * Updates submit button state and text area styling
+ */
+function updateSubmitState() {
+    let isValid = true;
+
+    // Check if input is empty
+    if (isInputEmpty()) {
+        submitButton.disabled = true;
+        isValid = false;
+    }
+
+    // Check text length if text exists
+    if (textArea.value.trim().length > 0) {
+        if (textArea.value.trim().length > MAX_TEXT_LENGTH) {
+            textArea.classList.add('is-invalid');
+            submitButton.disabled = true;
+            isValid = false;
+        } else {
+            textArea.classList.remove('is-invalid');
+        }
+    }
+
+    // Enable submit if file is selected or text is valid
+    if (fileInput.files[0] || validateTextLength()) {
+        submitButton.disabled = false;
+        isValid = true;
+    }
+
+    return isValid;
+}
 
 /**
  * Handles the form submission event.
@@ -19,69 +73,118 @@ form.addEventListener('submit', handleSubmit);
  */
 function handleSubmit(event) {
     event.preventDefault();
-    const text = textArea.value.trim();
+    
+    // Prepare form data
+    const formData = new FormData();
 
-    if (!validateInput(text)) {
-        showMessage("Please enter some text!", "alert-danger");
+    const text = textArea.value.trim();
+    const file = fileInput.files[0];
+
+
+    if (isInputEmpty()) {
+        showMessage("Please enter some text or upload a file!", "alert-danger");
         return;
     }
 
-    submitTextToApi(text);
+    if (file) {
+        formData.append('file', file);
+        submitTextToApi(formData);
+    }
+    else if (validateTextLength(text)) {
+        formData.append('text', text);
+        submitTextToApi(formData);
+    }
+    else {
+        showMessage("Some error occurred", "alert-danger");
+    }
 }
 
-/**
- * Validates the user input.
- * @param {string} text - The input text to validate.
- * @returns {boolean} - True if input is valid, false otherwise.
- */
-function validateInput(text) {
-    return text.length > 0;
-}
+// Event listener for form submission
+form.addEventListener('submit', handleSubmit);
 
-/**
- * Submits the text to the API.
- * @param {string} text - The input text to send to the API.
- */
-async function submitTextToApi(text) {
-    try {
-        const response = await fetch('https://example.com/api/submit', {
-            method: 'POST',
+function buildRequestFromFormData(formData) {
+    const text = formData.get('text');
+    const file = formData.get('file');
+
+    if (file) {
+        return {
+            method: 'Post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            body: formData
+        }
+    }
+
+    if (text) {
+        return {
+            method: 'Post',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
-        });
+            body: JSON.stringify({"text": text })
+        }
+    }
+
+    throw new Error('No content to submit');
+}
+
+async function submitTextToApi(formData) {
+    try {
+        const request = buildRequestFromFormData(formData);
+
+        console.log(request)
+
+        const response = await fetch('http://localhost:5000/api/submit', request);
 
         if (response.ok) {
-            //showMessage("Text submitted successfully!", "alert-success");
-            displayDataInTable(mockData); // Replace form with mock table
+            const data = await response.json();
+            showMessage("Submitted successfully!", "alert-success");
+            displayDataInTable(JSON.parse(data));
         } else {
-            //showMessage(`Error: ${response.statusText}`, "alert-danger");
-            displayDataInTable(mockData); // Replace form with mock table
+            const errorData = await response.json().catch(() => ({}));
+            showMessage(`Error: ${errorData.message || response.statusText}`, "alert-danger");
         }
     } catch (error) {
-        //showMessage(`Error: ${error.message}`, "alert-danger");
-        displayDataInTable(mockData); // Replace form with mock table
+        showMessage(`Error: ${error.message}`, "alert-danger");
     }
 }
 
 /**
- * Displays a message to the user.
- * @param {string} message - The message to display.
- * @param {string} alertClass - The Bootstrap alert class (e.g., 'alert-success').
+ * Shows an error message
+ * @param {string} message 
+ * @param {string} type 
  */
-function showMessage(message, alertClass) {
+function showMessage(message, type) {
     responseMessage.textContent = message;
-    responseMessage.className = `alert ${alertClass}`;
-    responseMessage.classList.remove('d-none');
+    responseMessage.className = `alert ${type} d-block`;
+    
+    setTimeout(() => {
+        responseMessage.className = 'alert mt-4 d-none';
+    }, 7000);
 }
+
+form.addEventListener('submit', handleSubmit);
+
+// Listen for input changes on textarea
+textArea.addEventListener('input', () => {
+    updateSubmitState();
+});
+
+// Listen for input changes on file input
+fileInput.addEventListener('change', () => {
+    updateSubmitState();
+});
+
+// Initial state setup
+submitButton.disabled = true;
+
 
 /**
  * Replaces the form with a table displaying data.
  * @param {Array<Object>} data - The data to display in the table.
  */
-function displayDataInTable(data) {
+function displayDataInTableOld(data) {
     // Clear the form content
     const container = form.parentElement;
-    container.innerHTML = "";
+    // container.innerHTML = "";
+    form.style.display = 'none';
 
     // Create table
     const table = document.createElement('table');
@@ -114,3 +217,66 @@ function displayDataInTable(data) {
     container.appendChild(table);
 }
 
+function displayDataInTable(data) {
+    const container = form.parentElement;
+    const responseContainter = document.createElement('div');
+    responseContainter.id = "responseContainer";
+    form.style.display = 'none';
+    container.appendChild(responseContainter);
+  
+    // Recursive function to create nested table structure
+    function createNestedTable(obj) {
+      // If it's not an object or is null, return the value as a string
+      if (typeof obj !== 'object' || obj === null) {
+        return document.createTextNode(String(obj));
+      }
+  
+      // Create table for nested objects
+      const table = document.createElement('table');
+      table.className = 'w-full border-collapse mb-4';
+  
+      // Iterate through object entries
+      Object.entries(obj).forEach(([key, value]) => {
+        const row = table.insertRow();
+        
+        // Key column
+        const keyCell = row.insertCell();
+        keyCell.className = 'p-2 bg-gray-100 font-bold border';
+        keyCell.textContent = key;
+  
+        // Value column
+        const valueCell = row.insertCell();
+        valueCell.className = 'p-2 border';
+        
+        // Recursively handle nested objects or simple values
+        if (typeof value === 'object' && value !== null) {
+          valueCell.appendChild(createNestedTable(value));
+        } else {
+          valueCell.textContent = String(value);
+        }
+      });
+  
+      return table;
+    }
+  
+    // Create and append sections for each top-level key
+    Object.entries(data).forEach(([section, content]) => {
+      console.log(section, content)
+      const sectionHeader = document.createElement('h3');
+      sectionHeader.className = 'text-xl font-semibold mb-2 bg-gray-200 p-2 rounded';
+      sectionHeader.textContent = section;
+      responseContainter.appendChild(sectionHeader);
+  
+      // Section content
+      const sectionContent = createNestedTable(content);
+      responseContainter.appendChild(sectionContent);
+    });
+}
+
+function returnHome() {
+    const responseContainer = document.getElementsById('responseContainer');
+    if (responseContainer) {
+        responseContainer.remove();
+    }
+    form.style.display = 'block';
+}
