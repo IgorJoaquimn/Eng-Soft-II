@@ -22,10 +22,9 @@ def treatResponse(response):
     # response = response.replace("\r", "").replace("\n", " ").strip()
     regex = r'{[\s\S]*}'
     match = re.search(regex, response)
+    json = ""
     if match:
         json = match.group(0)
-    else:
-        json = ""
     return json
 
 def getInfosFromText(text):

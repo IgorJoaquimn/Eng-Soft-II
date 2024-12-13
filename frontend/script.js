@@ -5,13 +5,8 @@ const fileInput = document.getElementById('fileUpload');
 const submitButton = document.getElementById('submitButton');
 const responseMessage = document.getElementById('responseMessage');
 
-<<<<<<< HEAD
-// API URL
-const apiUrl = "https://localhost";
-=======
 const MAX_TEXT_LENGTH = 5000; // Example: 5000 characters max
 const MIN_TEXT_LENGTH = 0;
->>>>>>> d3c2bc23503302ef0f56a88ed4854df32d3cfab3
 
 // Mock data for demonstration
 const mockData = [
@@ -132,24 +127,6 @@ function buildRequestFromFormData(formData) {
 
 async function submitTextToApi(formData) {
     try {
-<<<<<<< HEAD
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
-        });
-
-        if (response.ok) {
-            showMessage("Text submitted successfully!", "alert-success");
-            displayDataInTable(mockData); // Replace form with mock table
-        } else {
-            showMessage(`Error: ${response.statusText}`, "alert-danger");
-            displayDataInTable(mockData); // Replace form with mock table
-        }
-    } catch (error) {
-        showMessage(`Error: ${error.message}`, "alert-danger");
-        displayDataInTable(mockData); // Replace form with mock table
-=======
         const request = buildRequestFromFormData(formData);
 
         console.log(request)
@@ -166,7 +143,6 @@ async function submitTextToApi(formData) {
         }
     } catch (error) {
         showMessage(`Error: ${error.message}`, "alert-danger");
->>>>>>> d3c2bc23503302ef0f56a88ed4854df32d3cfab3
     }
 }
 

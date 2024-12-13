@@ -1,4 +1,3 @@
-// Import the functions to test
 const { validateInput, showMessage, displayDataInTable } = require('./script');
 
 // Mock DOM environment for testing
