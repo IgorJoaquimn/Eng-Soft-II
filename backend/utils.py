@@ -7,24 +7,24 @@ def process_file(request):
     # Get the file
     file = request.files.get('file')
 
-    if file:
-        # Save the file
-        filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(filepath)
+    if not file: return jsonify({"error": "No file received"}), 400
 
-        print(f"Received File:")
-        print(f"Filename: {file.filename}")
-        print(f"Filepath: {filepath}")
+    # Save the file
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
 
-        # Read file content
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-            print("File Content:")
-            print(content)
+    print(f"Received File:")
+    print(f"Filename: {file.filename}")
+    print(f"Filepath: {filepath}")
 
-            # Example mock response for file upload
-            return jsonify([
-                {"id": 1, "filename": file.filename, "file_size": len(content)},
-                {"id": 2, "name": "File Processing", "details": "File processed successfully"}
-            ])
-    return jsonify({"error": "No file received"}), 400
+    # Read file content
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+        print("File Content:")
+        print(content)
+
+        # Example mock response for file upload
+        return jsonify([
+            {"id": 1, "filename": file.filename, "file_size": len(content)},
+            {"id": 2, "name": "File Processing", "details": "File processed successfully"}
+        ])
