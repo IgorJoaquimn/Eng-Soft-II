@@ -3,6 +3,9 @@ const form = document.getElementById('textForm');
 const textArea = document.getElementById('largeText');
 const responseMessage = document.getElementById('responseMessage');
 
+// API URL
+const apiUrl = "https://localhost";
+
 // Mock data for demonstration
 const mockData = [
     { id: 1, name: "John Doe", age: 30 },
@@ -44,21 +47,21 @@ function validateInput(text) {
  */
 async function submitTextToApi(text) {
     try {
-        const response = await fetch('https://example.com/api/submit', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text }),
         });
 
         if (response.ok) {
-            //showMessage("Text submitted successfully!", "alert-success");
+            showMessage("Text submitted successfully!", "alert-success");
             displayDataInTable(mockData); // Replace form with mock table
         } else {
-            //showMessage(`Error: ${response.statusText}`, "alert-danger");
+            showMessage(`Error: ${response.statusText}`, "alert-danger");
             displayDataInTable(mockData); // Replace form with mock table
         }
     } catch (error) {
-        //showMessage(`Error: ${error.message}`, "alert-danger");
+        showMessage(`Error: ${error.message}`, "alert-danger");
         displayDataInTable(mockData); // Replace form with mock table
     }
 }
