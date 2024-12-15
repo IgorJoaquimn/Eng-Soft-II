@@ -82,5 +82,19 @@ describe('Form Validation Tests', () => {
         expect(mockEvent.preventDefault).toHaveBeenCalled();
         expect(responseMessage.textContent).toBe('Please enter some text or upload a file!');
     });
+
+    test('showMessage should display a message and remove it after timeout', () => {
+        jest.useFakeTimers();
+
+        showMessage(responseMessage, 'Test message', 'alert-success');
+        expect(responseMessage.textContent).toBe('Test message');
+        expect(responseMessage.classList.contains('alert-success')).toBe(true);
+
+        jest.advanceTimersByTime(7000);
+        expect(responseMessage.classList.contains('d-none')).toBe(true);
+
+        jest.useRealTimers();
+    });
+
 });
 
