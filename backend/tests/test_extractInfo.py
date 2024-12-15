@@ -1,6 +1,7 @@
 from extractInfo import *
 from unittest.mock import MagicMock
 import unittest
+import json
 
 
 class TestGeminiExtractor(unittest.TestCase):
@@ -27,7 +28,13 @@ Data: 15/12/2024
         """
         expected_json = '{"Tipo de Documento": "Contrato", "Data": "15/12/2024"}'
         result = treatResponse(response)
-        self.assertEqual(result, expected_json)
+        
+        # Parse both the result and expected JSON into dictionaries
+        result_dict = json.loads(result)
+        expected_dict = json.loads(expected_json)
+        
+        # Assert that the dictionaries are the same
+        self.assertDictEqual(result_dict, expected_dict)
 
     def test_treatResponse_without_json(self):
         response = "Nenhum dado encontrado."
@@ -47,7 +54,11 @@ Data: 15/12/2024
 
         expected_json = '{"Tipo de Documento": "Contrato", "Data": "15/12/2024"}'
         result = getInfosFromText(inputText)
-        self.assertEqual(result, expected_json)
+
+        result_dict = json.loads(result)
+        expected_dict = json.loads(expected_json)
+
+        self.assertDictEqual(result_dict, expected_dict)
 
 
 if __name__ == '__main__':
