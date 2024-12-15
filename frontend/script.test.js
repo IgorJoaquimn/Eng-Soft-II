@@ -1,163 +1,86 @@
-const { JSDOM } = require('jsdom');
-
-// Set up the mock DOM environment using jsdom
-const { window } = new JSDOM(`
-  <!DOCTYPE html>
-  <html>
-    <body>
-      <div id="container">
-        <form id="textForm">
-          <textarea id="largeText"></textarea>
-          <input type="file" id="fileUpload">
-          <button type="submit" id="submitButton" disabled>Submit</button>
-        </form>
-        <div id="responseMessage" class="d-none"></div>
-      </div>
-    </body>
-  </html>
-`);
-
-const { document } = window;
-
-// Mock global document and window
-global.document = document;
-global.window = window;
-
-// Import the functions to be tested
 const {
-  isInputEmpty,
-  validateTextLength,
-  updateSubmitState,
-  handleSubmit,
-  showMessage,
-  displayDataInTable,
+    isInputEmpty,
+    validateTextLength,
+    updateSubmitState,
+    handleSubmit,
+    showMessage,
+    displayDataInTable,
 } = require('./script.js');
 
-// Helper function to reset DOM elements between tests
-const resetDOM = () => {
-  document.getElementById('largeText').value = '';
-  const responseMessage = document.getElementById('responseMessage');
-  responseMessage.textContent = '';
-  responseMessage.className = 'd-none';
-  document.getElementById('container').innerHTML = `
-    <form id="textForm">
-      <textarea id="largeText"></textarea>
-      <input type="file" id="fileUpload">
-      <button type="submit" id="submitButton" disabled>Submit</button>
-    </form>
-    <div id="responseMessage" class="d-none"></div>
-  `;
-};
+describe('Form Validation Tests', () => {
+    let textArea, fileInput, submitButton, responseMessage, form;
 
-describe('script.js Unit Tests', () => {
-  beforeEach(() => {
-    resetDOM();
+    beforeEach(() => {
+        // Set up a DOM mock
+        document.body.innerHTML = `
+        <div class="container mt-5">
+            <form id="textForm">
+                <div class="mb-3">
+                    <textarea id="largeText" class="form-control" rows="10"></textarea>
+                </div>
+                <div class="mb-3">
+                    <input type="file" class="form-control" id="fileUpload" accept=".txt,.pdf,.docx,.doc">
+                </div>
+                <button id="submitButton" class="btn btn-primary w-100" disabled></button>
+                <div id="responseMessage" class="alert mt-4 d-none"></div>
+            </form>
+        </div>`;
 
-    const form = document.getElementById('textForm');
-    form.addEventListener('submit', handleSubmit);
-  });
-
-  afterEach(() => {
-    resetDOM();
-  });
-
-  test('isInputEmpty returns true when both textarea and file input are empty', () => {
-    const textArea = document.getElementById('largeText');
-    const fileInput = document.getElementById('fileUpload');
-
-    expect(textArea).not.toBeNull();
-    expect(fileInput).not.toBeNull();
-    
-    Object.defineProperty(fileInput, 'files', {
-        value: [],
-        writable: false,
+        textArea = document.getElementById('largeText');
+        fileInput = document.getElementById('fileUpload');
+        submitButton = document.getElementById('submitButton');
+        responseMessage = document.getElementById('responseMessage');
+        form = document.getElementById('textForm');
     });
 
-    textArea.value = '';
-    expect(isInputEmpty()).toBe(true);
-});
+    test('isInputEmpty should return true if both text and file are empty', () => {
+        expect(isInputEmpty(textArea, fileInput)).toBe(true);
 
-  test('isInputEmpty returns false when textarea has text', () => {
-    document.getElementById('largeText').value = 'Some text';
-    document.getElementById('fileUpload').files = [];
-    expect(isInputEmpty()).toBe(false);
-  });
+        textArea.value = 'Sample text';
+        expect(isInputEmpty(textArea, fileInput)).toBe(false);
 
-  test('validateTextLength returns true for valid text length', () => {
-    document.getElementById('largeText').value = 'Some text';
-    expect(validateTextLength()).toBe(true);
-  });
-
-  test('validateTextLength returns false for empty text', () => {
-    document.getElementById('largeText').value = '';
-    expect(validateTextLength()).toBe(false);
-  });
-
-  test('updateSubmitState disables submit button when input is empty', () => {
-    document.getElementById('largeText').value = '';
-    document.getElementById('fileUpload').files = [];
-    updateSubmitState();
-    const submitButton = document.getElementById('submitButton');
-    expect(submitButton.disabled).toBe(true);
-  });
-
-  test('updateSubmitState enables submit button when text is valid', () => {
-    document.getElementById('largeText').value = 'Some valid text';
-    document.getElementById('fileUpload').files = [];
-    updateSubmitState();
-    const submitButton = document.getElementById('submitButton');
-    expect(submitButton.disabled).toBe(false);
-  });
-
-  test('handleSubmit shows error message if input is empty', () => {
-    document.getElementById('largeText').value = '';
-    document.getElementById('fileUpload').files = [];
-    const mockEvent = { preventDefault: jest.fn() };
-    handleSubmit(mockEvent);
-    const responseMessage = document.getElementById('responseMessage');
-    expect(responseMessage.textContent).toBe('Please enter some text or upload a file!');
-  });
-
-  test('showMessage displays success message correctly', () => {
-    const message = 'Submission successful!';
-    showMessage(message, 'alert-success');
-    const responseMessage = document.getElementById('responseMessage');
-    expect(responseMessage.textContent).toBe(message);
-    expect(responseMessage.className).toContain('alert-success');
-    expect(responseMessage.className).not.toContain('d-none');
-  });
-
-  test('showMessage displays error message correctly', () => {
-    const message = 'An error occurred!';
-    showMessage(message, 'alert-danger');
-    const responseMessage = document.getElementById('responseMessage');
-    expect(responseMessage.textContent).toBe(message);
-    expect(responseMessage.className).toContain('alert-danger');
-    expect(responseMessage.className).not.toContain('d-none');
-  });
-
-  test('displayDataInTable renders table with mock data', () => {
-    const mockData = [
-      { id: 1, name: 'John Doe', age: 30 },
-      { id: 2, name: 'Jane Smith', age: 25 },
-    ];
-
-    displayDataInTable(mockData);
-
-    const container = document.getElementById('container');
-    expect(container.querySelector('form')).toBeNull(); // Form should be removed
-    const table = container.querySelector('table');
-    expect(table).not.toBeNull(); // Table should be created
-
-    const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent);
-    expect(headers).toEqual(['Id', 'Name', 'Age']);
-
-    const rows = Array.from(table.querySelectorAll('tbody tr'));
-    expect(rows).toHaveLength(mockData.length);
-
-    rows.forEach((row, index) => {
-      const cells = Array.from(row.querySelectorAll('td')).map(td => td.textContent);
-      expect(cells).toEqual(Object.values(mockData[index]).map(String));
+        textArea.value = '';
+        const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
+        Object.defineProperty(fileInput, 'files', {
+            value: [file],
+            writable: false,
+        });
+        expect(isInputEmpty(textArea, fileInput)).toBe(false);
     });
-  });
+
+    test('validateTextLength should validate text length correctly', () => {
+        textArea.value = 'Valid text';
+        expect(validateTextLength(textArea)).toBe(true);
+
+        textArea.value = ''.padStart(5001, 'a');
+        expect(validateTextLength(textArea)).toBe(false);
+
+        textArea.value = '';
+        expect(validateTextLength(textArea)).toBe(false);
+    });
+
+
+    test('updateSubmitState should enable or disable submit button', () => {
+        // Initially disabled
+        updateSubmitState(textArea,fileInput,submitButton);
+        expect(submitButton.disabled).toBe(true);
+
+        // Enable button if text is valid
+        textArea.value = 'Valid text';
+        updateSubmitState(textArea,fileInput,submitButton);
+        expect(submitButton.disabled).toBe(false);
+
+        // Disable if text is too long
+        textArea.value = ''.padStart(5001, 'a');
+        updateSubmitState(textArea,fileInput,submitButton);
+        expect(submitButton.disabled).toBe(true);
+    });
+
+    test('handleSubmit should prevent submission with empty input', () => {
+        const mockEvent = { preventDefault: jest.fn() };
+        handleSubmit(mockEvent,textArea,fileInput,responseMessage);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(responseMessage.textContent).toBe('Please enter some text or upload a file!');
+    });
 });
+

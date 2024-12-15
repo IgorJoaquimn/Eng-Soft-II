@@ -9,19 +9,21 @@ const responseMessage = document.getElementById('responseMessage');
 document.addEventListener('DOMContentLoaded', () => {
     // Listen for input changes on textarea
     textArea.addEventListener('input', () => {
-        updateSubmitState();
+        updateSubmitState(textArea,fileInput,submitButton);
     });
-    
+
     // Listen for input changes on file input
     fileInput.addEventListener('change', () => {
-        updateSubmitState();
+        updateSubmitState(textArea,fileInput,submitButton);
     });
-    
+
     // Initial state setup
     submitButton.disabled = true;
-    
-    
-    form.addEventListener('submit', handleSubmit);
+
+
+    form.addEventListener('submit', function (event) {
+        handleSubmit(event,textArea,fileInput,responseMessage);
+    });
 });
 
 const MAX_TEXT_LENGTH = 5000; // Example: 5000 characters max
@@ -33,23 +35,24 @@ const mockData = [
     { id: 2, name: "Jane Smith", age: 25 },
     { id: 3, name: "Alice Johnson", age: 35 }
 ];
-
 /**
- * Checks if the input is empty (no text and no file)
- * @returns {boolean}
+ * Checks if both text and file inputs are empty.
+ * @param {HTMLTextAreaElement} textArea - The textarea element.
+ * @param {HTMLInputElement} fileInput - The file input element.
+ * @returns {boolean} - True if both inputs are empty, false otherwise.
  */
-function isInputEmpty() {
+function isInputEmpty(textArea, fileInput) {
     const text = textArea.value.trim();
-    const file = fileInput.files[0];
-
-    return text.length === 0 && !file;
+    const files = fileInput.files;
+    return text === '' && files.length === 0;
 }
 
 /**
- * Validates text input length
- * @returns {boolean}
+ * Validates the text length in the textarea element.
+ * @param {HTMLTextAreaElement} textArea - The textarea element.
+ * @returns {boolean} - True if text length is valid, false otherwise.
  */
-function validateTextLength() {
+function validateTextLength(textArea) {
     const text = textArea.value.trim();
     return text.length > 0 && text.length <= MAX_TEXT_LENGTH;
 }
@@ -57,11 +60,11 @@ function validateTextLength() {
 /**
  * Updates submit button state and text area styling
  */
-function updateSubmitState() {
+function updateSubmitState(textArea,fileInput,submitButton) {
     let isValid = true;
 
     // Check if input is empty
-    if (isInputEmpty()) {
+    if (isInputEmpty(textArea,fileInput)) {
         submitButton.disabled = true;
         isValid = false;
     }
@@ -78,7 +81,7 @@ function updateSubmitState() {
     }
 
     // Enable submit if file is selected or text is valid
-    if (fileInput.files[0] || validateTextLength()) {
+    if (fileInput.files[0] || validateTextLength(textArea)) {
         submitButton.disabled = false;
         isValid = true;
     }
@@ -90,9 +93,9 @@ function updateSubmitState() {
  * Handles the form submission event.
  * @param {Event} event 
  */
-function handleSubmit(event) {
+function handleSubmit(event,textArea,fileInput,responseMessage){
     event.preventDefault();
-    
+
     // Prepare form data
     const formData = new FormData();
 
@@ -100,8 +103,8 @@ function handleSubmit(event) {
     const file = fileInput.files[0];
 
 
-    if (isInputEmpty()) {
-        showMessage("Please enter some text or upload a file!", "alert-danger");
+    if (isInputEmpty(textArea,fileInput)) {
+        showMessage(responseMessage,"Please enter some text or upload a file!", "alert-danger");
         return;
     }
 
@@ -167,10 +170,10 @@ async function submitTextToApi(formData) {
  * @param {string} message 
  * @param {string} type 
  */
-function showMessage(message, type) {
+function showMessage(responseMessage,message, type) {
     responseMessage.textContent = message;
     responseMessage.className = `alert ${type} d-block`;
-    
+
     setTimeout(() => {
         responseMessage.className = 'alert mt-4 d-none';
     }, 7000);
@@ -223,53 +226,53 @@ function displayDataInTable(data) {
     responseContainter.id = "responseContainer";
     form.style.display = 'none';
     container.appendChild(responseContainter);
-  
+
     // Recursive function to create nested table structure
     function createNestedTable(obj) {
-      // If it's not an object or is null, return the value as a string
-      if (typeof obj !== 'object' || obj === null) {
-        return document.createTextNode(String(obj));
-      }
-  
-      // Create table for nested objects
-      const table = document.createElement('table');
-      table.className = 'w-full border-collapse mb-4';
-  
-      // Iterate through object entries
-      Object.entries(obj).forEach(([key, value]) => {
-        const row = table.insertRow();
-        
-        // Key column
-        const keyCell = row.insertCell();
-        keyCell.className = 'p-2 bg-gray-100 font-bold border';
-        keyCell.textContent = key;
-  
-        // Value column
-        const valueCell = row.insertCell();
-        valueCell.className = 'p-2 border';
-        
-        // Recursively handle nested objects or simple values
-        if (typeof value === 'object' && value !== null) {
-          valueCell.appendChild(createNestedTable(value));
-        } else {
-          valueCell.textContent = String(value);
+        // If it's not an object or is null, return the value as a string
+        if (typeof obj !== 'object' || obj === null) {
+            return document.createTextNode(String(obj));
         }
-      });
-  
-      return table;
+
+        // Create table for nested objects
+        const table = document.createElement('table');
+        table.className = 'w-full border-collapse mb-4';
+
+        // Iterate through object entries
+        Object.entries(obj).forEach(([key, value]) => {
+            const row = table.insertRow();
+
+            // Key column
+            const keyCell = row.insertCell();
+            keyCell.className = 'p-2 bg-gray-100 font-bold border';
+            keyCell.textContent = key;
+
+            // Value column
+            const valueCell = row.insertCell();
+            valueCell.className = 'p-2 border';
+
+            // Recursively handle nested objects or simple values
+            if (typeof value === 'object' && value !== null) {
+                valueCell.appendChild(createNestedTable(value));
+            } else {
+                valueCell.textContent = String(value);
+            }
+        });
+
+        return table;
     }
-  
+
     // Create and append sections for each top-level key
     Object.entries(data).forEach(([section, content]) => {
-      console.log(section, content)
-      const sectionHeader = document.createElement('h3');
-      sectionHeader.className = 'text-xl font-semibold mb-2 bg-gray-200 p-2 rounded';
-      sectionHeader.textContent = section;
-      responseContainter.appendChild(sectionHeader);
-  
-      // Section content
-      const sectionContent = createNestedTable(content);
-      responseContainter.appendChild(sectionContent);
+        console.log(section, content)
+        const sectionHeader = document.createElement('h3');
+        sectionHeader.className = 'text-xl font-semibold mb-2 bg-gray-200 p-2 rounded';
+        sectionHeader.textContent = section;
+        responseContainter.appendChild(sectionHeader);
+
+        // Section content
+        const sectionContent = createNestedTable(content);
+        responseContainter.appendChild(sectionContent);
     });
 }
 
@@ -288,4 +291,4 @@ module.exports =  {
     handleSubmit,
     showMessage,
     displayDataInTable,
-  };
+};
