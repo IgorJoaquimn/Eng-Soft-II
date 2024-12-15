@@ -1,9 +1,28 @@
 // Select DOM elements
+
 const form = document.getElementById('textForm');
 const textArea = document.getElementById('largeText');
 const fileInput = document.getElementById('fileUpload');
 const submitButton = document.getElementById('submitButton');
 const responseMessage = document.getElementById('responseMessage');
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Listen for input changes on textarea
+    textArea.addEventListener('input', () => {
+        updateSubmitState();
+    });
+    
+    // Listen for input changes on file input
+    fileInput.addEventListener('change', () => {
+        updateSubmitState();
+    });
+    
+    // Initial state setup
+    submitButton.disabled = true;
+    
+    
+    form.addEventListener('submit', handleSubmit);
+});
 
 const MAX_TEXT_LENGTH = 5000; // Example: 5000 characters max
 const MIN_TEXT_LENGTH = 0;
@@ -99,9 +118,6 @@ function handleSubmit(event) {
     }
 }
 
-// Event listener for form submission
-form.addEventListener('submit', handleSubmit);
-
 function buildRequestFromFormData(formData) {
     const text = formData.get('text');
     const file = formData.get('file');
@@ -159,22 +175,6 @@ function showMessage(message, type) {
         responseMessage.className = 'alert mt-4 d-none';
     }, 7000);
 }
-
-form.addEventListener('submit', handleSubmit);
-
-// Listen for input changes on textarea
-textArea.addEventListener('input', () => {
-    updateSubmitState();
-});
-
-// Listen for input changes on file input
-fileInput.addEventListener('change', () => {
-    updateSubmitState();
-});
-
-// Initial state setup
-submitButton.disabled = true;
-
 
 /**
  * Replaces the form with a table displaying data.
@@ -280,3 +280,12 @@ function returnHome() {
     }
     form.style.display = 'block';
 }
+
+module.exports =  {
+    isInputEmpty,
+    validateTextLength,
+    updateSubmitState,
+    handleSubmit,
+    showMessage,
+    displayDataInTable,
+  };
