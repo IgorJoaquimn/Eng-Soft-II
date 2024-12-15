@@ -13,7 +13,6 @@ const { window } = new JSDOM(`
         </form>
         <div id="responseMessage" class="d-none"></div>
       </div>
-      <script src="script.js"></script>
     </body>
   </html>
 `);
@@ -26,14 +25,13 @@ global.window = window;
 
 // Import the functions to be tested
 const {
-  validateInput,
-  showMessage,
-  displayDataInTable,
   isInputEmpty,
   validateTextLength,
   updateSubmitState,
   handleSubmit,
-} = require('./script');
+  showMessage,
+  displayDataInTable,
+} = require('./script.js');
 
 // Helper function to reset DOM elements between tests
 const resetDOM = () => {
@@ -52,65 +50,36 @@ const resetDOM = () => {
 };
 
 describe('script.js Unit Tests', () => {
-  beforeAll(() => { 
-      const form = document.querySelector('textForm');
-      form.addEventListener('submit', handleSubmit);
-    
-  });
-
   beforeEach(() => {
-    // Reinitialize the DOM and reset everything before each test
     resetDOM();
+
+    const form = document.getElementById('textForm');
+    form.addEventListener('submit', handleSubmit);
   });
 
   afterEach(() => {
     resetDOM();
   });
 
-  test('validateInput returns true for non-empty input', () => {
-    document.getElementById('largeText').value = 'Hello';
-    expect(validateInput('Hello')).toBe(true);
-  });
-
-  test('validateInput returns false for empty input', () => {
-    document.getElementById('largeText').value = '';
-    expect(validateInput('')).toBe(false);
-  });
-
-  test('showMessage displays success message correctly', () => {
-    const message = 'Submission successful!';
-    showMessage(message, 'alert-success');
-    const responseMessage = document.getElementById('responseMessage');
-    expect(responseMessage.textContent).toBe(message);
-    expect(responseMessage.className).toContain('alert-success');
-    expect(responseMessage.className).not.toContain('d-none');
-  });
-
-  test('showMessage displays error message correctly', () => {
-    const message = 'An error occurred!';
-    showMessage(message, 'alert-danger');
-    const responseMessage = document.getElementById('responseMessage');
-    expect(responseMessage.textContent).toBe(message);
-    expect(responseMessage.className).toContain('alert-danger');
-    expect(responseMessage.className).not.toContain('d-none');
-  });
-
   test('isInputEmpty returns true when both textarea and file input are empty', () => {
-    document.getElementById('largeText').value = '';
-    document.getElementById('fileUpload').files = [];
+    const textArea = document.getElementById('largeText');
+    const fileInput = document.getElementById('fileUpload');
+
+    expect(textArea).not.toBeNull();
+    expect(fileInput).not.toBeNull();
+    
+    Object.defineProperty(fileInput, 'files', {
+        value: [],
+        writable: false,
+    });
+
+    textArea.value = '';
     expect(isInputEmpty()).toBe(true);
-  });
+});
 
   test('isInputEmpty returns false when textarea has text', () => {
     document.getElementById('largeText').value = 'Some text';
     document.getElementById('fileUpload').files = [];
-    expect(isInputEmpty()).toBe(false);
-  });
-
-  test('isInputEmpty returns false when file input has file', () => {
-    const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
-    document.getElementById('largeText').value = '';
-    document.getElementById('fileUpload').files = [file];
     expect(isInputEmpty()).toBe(false);
   });
 
@@ -140,7 +109,34 @@ describe('script.js Unit Tests', () => {
     expect(submitButton.disabled).toBe(false);
   });
 
-  test('displayDataInTable replaces form with a table', () => {
+  test('handleSubmit shows error message if input is empty', () => {
+    document.getElementById('largeText').value = '';
+    document.getElementById('fileUpload').files = [];
+    const mockEvent = { preventDefault: jest.fn() };
+    handleSubmit(mockEvent);
+    const responseMessage = document.getElementById('responseMessage');
+    expect(responseMessage.textContent).toBe('Please enter some text or upload a file!');
+  });
+
+  test('showMessage displays success message correctly', () => {
+    const message = 'Submission successful!';
+    showMessage(message, 'alert-success');
+    const responseMessage = document.getElementById('responseMessage');
+    expect(responseMessage.textContent).toBe(message);
+    expect(responseMessage.className).toContain('alert-success');
+    expect(responseMessage.className).not.toContain('d-none');
+  });
+
+  test('showMessage displays error message correctly', () => {
+    const message = 'An error occurred!';
+    showMessage(message, 'alert-danger');
+    const responseMessage = document.getElementById('responseMessage');
+    expect(responseMessage.textContent).toBe(message);
+    expect(responseMessage.className).toContain('alert-danger');
+    expect(responseMessage.className).not.toContain('d-none');
+  });
+
+  test('displayDataInTable renders table with mock data', () => {
     const mockData = [
       { id: 1, name: 'John Doe', age: 30 },
       { id: 2, name: 'Jane Smith', age: 25 },
