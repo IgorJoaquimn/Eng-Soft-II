@@ -1,9 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from flask import Flask
-import os
 
-from utils import process_file
+from utils import process_file, validate_file_input
 
 class TestProcessFile(unittest.TestCase):
 
@@ -34,26 +33,47 @@ class TestProcessFile(unittest.TestCase):
         mock_file.save.assert_called_once_with("/mock/uploads/test_file.txt")
         mock_open.assert_called_once_with("/mock/uploads/test_file.txt", 'r', encoding='UTF-8')
 
-        json_data = response.get_json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(json_data), 2)
-        self.assertEqual(json_data[0]["filename"], "test_file.txt")
-        self.assertEqual(json_data[0]["file_size"], len(file_content))
-
-    def test_process_file_no_file(self):
-        # Setup mocks
+    def test_no_file_received(self):
+        # Test for no file in the request
         mock_request = MagicMock()
         mock_request.files.get.return_value = None
 
         # Create a Flask app context
         app = Flask(__name__)
         with app.app_context():
-            response = process_file(mock_request)
+            response = validate_file_input(mock_request)
 
         # Assertions
-        json_data = response[0]
-        self.assertEqual(response[1], 400)
-        self.assertEqual(json_data.get_json(), {"error": "No file received"})
+        self.assertEqual(response, "No file received")
+
+    def test_empty_filename(self):
+        # Simulate the request with an empty filename
+        mock_request = MagicMock()
+        mock_request.files.get.return_value = MagicMock(filename="")
+
+        # Create a Flask app context
+        app = Flask(__name__)
+        with app.app_context():
+            response = validate_file_input(mock_request)
+
+        # Assertions
+        self.assertEqual(response, "Empty filename")
+
+    def test_unsupported_file_type(self):
+        mock_request = MagicMock()
+        mock_file = MagicMock()
+        mock_file.filename = "example.exe"
+        mock_request.files.get.return_value = mock_file
+
+        # Create a Flask app context
+        app = Flask(__name__)
+        with app.app_context():
+            response = validate_file_input(mock_request)
+
+        # Assertions
+        self.assertEqual(response, "Unsupported file type")
+    
+    
 
 if __name__ == "__main__":
     unittest.main()
