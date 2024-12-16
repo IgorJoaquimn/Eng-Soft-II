@@ -53,7 +53,7 @@ function isInputEmpty(textArea, fileInput) {
  * @returns {boolean} - True if text length is valid, false otherwise.
  */
 function validateTextLength(textArea) {
-    const text = textArea.value.trim();
+    const text = textArea.value;
     return text.length > 0 && text.length <= MAX_TEXT_LENGTH;
 }
 
@@ -96,10 +96,8 @@ function updateSubmitState(textArea,fileInput,submitButton) {
 function handleSubmit(event,textArea,fileInput,responseMessage){
     event.preventDefault();
 
-    // Prepare form data
     const formData = new FormData();
-
-    const text = textArea.value.trim();
+    
     const file = fileInput.files[0];
 
 
@@ -112,8 +110,8 @@ function handleSubmit(event,textArea,fileInput,responseMessage){
         formData.append('file', file);
         submitTextToApi(formData);
     }
-    else if (validateTextLength(text)) {
-        formData.append('text', text);
+    else if (validateTextLength(textArea)) {
+        formData.append('text', textArea.value.trim());
         submitTextToApi(formData);
     }
     else {
@@ -128,7 +126,6 @@ function buildRequestFromFormData(formData) {
     if (file) {
         return {
             method: 'Post',
-            headers: { 'Content-Type': 'multipart/form-data' },
             body: formData
         }
     }
@@ -148,18 +145,20 @@ async function submitTextToApi(formData) {
     try {
         const request = buildRequestFromFormData(formData);
 
-        console.log(request)
-
         const response = await fetch('http://localhost:5000/api/submit', request);
 
-        if (response.ok) {
-            const data = await response.json();
-            showMessage("Submitted successfully!", "alert-success");
-            displayDataInTable(JSON.parse(data));
-        } else {
-            const errorData = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: "Unknown error occurred" }));
             showMessage(`Error: ${errorData.message || response.statusText}`, "alert-danger");
+            return;
         }
+
+        const data = await response.json();
+        showMessage("Submitted successfully!", "alert-success");
+        displayDataInTable(JSON.parse(data));
+        textArea.value = "";
+        fileInput.value = "";
+
     } catch (error) {
         showMessage(`Error: ${error.message}`, "alert-danger");
     }
@@ -277,7 +276,7 @@ function displayDataInTable(data) {
 }
 
 function returnHome() {
-    const responseContainer = document.getElementsById('responseContainer');
+    const responseContainer = document.getElementById('responseContainer');
     if (responseContainer) {
         responseContainer.remove();
     }

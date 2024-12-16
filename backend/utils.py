@@ -4,27 +4,20 @@ from flask import jsonify
 UPLOAD_FOLDER = 'uploads'
 
 def process_file(request):
-    # Get the file
+
     file = request.files.get('file')
 
-    if not file: return jsonify({"error": "No file received"}), 400
+    if file.filename == "":
+        return jsonify({"error": "Empty filename"}), 400
 
-    # Save the file
+    allowed_extensions = {'txt', 'pdf', 'docx', 'doc'}
+    if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in allowed_extensions):
+        return jsonify({"error": "Unsupported file type"}), 400
+
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
-    print(f"Received File:")
-    print(f"Filename: {file.filename}")
-    print(f"Filepath: {filepath}")
+    with open(filepath, 'r', encoding='UTF-8') as f:
+        content = f.read(1024 * 1024)
 
-    # Read file content
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
-        print("File Content:")
-        print(content)
-
-        # Example mock response for file upload
-        return jsonify([
-            {"id": 1, "filename": file.filename, "file_size": len(content)},
-            {"id": 2, "name": "File Processing", "details": "File processed successfully"}
-        ])
+        return content

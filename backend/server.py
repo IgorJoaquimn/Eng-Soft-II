@@ -19,7 +19,7 @@ def submit_data():
         
         # Check if it's a multipart form data request (file upload)
         if request.files:
-            return process_file(request)
+            return jsonify(getInfosFromText(process_file(request)))
         
         # If neither JSON nor file
         return jsonify({"error": "Invalid request format"}), 400
