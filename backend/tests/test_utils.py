@@ -32,7 +32,7 @@ class TestProcessFile(unittest.TestCase):
 
         # Assertions
         mock_file.save.assert_called_once_with("/mock/uploads/test_file.txt")
-        mock_open.assert_called_once_with("/mock/uploads/test_file.txt", 'r', encoding='utf-8')
+        mock_open.assert_called_once_with("/mock/uploads/test_file.txt", 'r', encoding='UTF-8')
 
         json_data = response.get_json()
         self.assertEqual(response.status_code, 200)

@@ -7,6 +7,9 @@ def process_file(request):
 
     file = request.files.get('file')
 
+    if not file:
+        return jsonify({"error": "No file received"}), 400
+    
     if file.filename == "":
         return jsonify({"error": "Empty filename"}), 400
 
