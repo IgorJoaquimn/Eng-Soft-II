@@ -2,7 +2,7 @@
 
 ## Membros do Grupo
 - **Gabriel Franco Jallais**
-- **Henrique Daniel Sousa**
+- **Henrique Daniel de Sousa**
 - **Igor Joaquim da Silva Costa**
 
 ## Explicação do Sistema
