@@ -12,6 +12,7 @@ PROMPT = """
 llm = GeminiGenerator()
 
 def injectTextOnPrompt(inputText):
+    inputText = str(inputText)
     templateString : str = r'{{(.*?)}}'
     replacedText : str = re.sub(pattern=templateString, 
                         repl=inputText, 

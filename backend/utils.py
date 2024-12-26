@@ -5,11 +5,6 @@ from extractInfo import getInfosFromText
 UPLOAD_FOLDER = 'uploads'
 
 def process_request(request):
-    if request.is_json:
-        data = request.get_json()
-        text = data.get('text', "")
-        return jsonify(getInfosFromText(text))
-
     # Check if it's a multipart form data request (file upload)
     if request.files:
         error_message = validate_file_input(request)
@@ -18,6 +13,12 @@ def process_request(request):
 
         text = process_file(request)
         return jsonify(getInfosFromText(text))
+
+    if request.is_json:
+        data = request.get_json()
+        text = data.get('text', "")
+        return jsonify(getInfosFromText(text))
+
 
     return jsonify({"error": "Invalid request format"}), 400
 
