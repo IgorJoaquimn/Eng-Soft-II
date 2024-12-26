@@ -21,6 +21,7 @@ def injectTextOnPrompt(inputText):
     
 def treatResponse(response):
     # response = response.replace("\r", "").replace("\n", " ").strip()
+    response = str(response)
     regex = r'{[\s\S]*}'
     match = re.search(regex, response)
     if match:

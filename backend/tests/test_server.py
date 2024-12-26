@@ -21,7 +21,8 @@ class TestServer(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
     @patch('utils.process_file')
-    def test_submit_data_file(self, mock_process_file):
+    @patch('extractInfo.llm.generate')
+    def test_submit_data_file(self, mock_process_file,mock_generateText):
         
         # Use app context to ensure jsonify works correctly
         with app.app_context():
