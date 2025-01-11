@@ -1,5 +1,5 @@
 import os
-from flask import jsonify
+from flask import jsonify, abort
 from extractInfo import getInfosFromText
 
 UPLOAD_FOLDER = 'uploads'
@@ -19,8 +19,7 @@ def process_request(request):
         text = data.get('text', "")
         return jsonify(getInfosFromText(text))
 
-
-    return jsonify({"error": "Invalid request format"}), 400
+    abort(400, description="Invalid request format")
 
 def process_file(request):
 
@@ -38,13 +37,13 @@ def validate_file_input(request):
 
     file = request.files.get('file')
     if not file:
-        return "No file received"
+        abort(400, description="No file received")
 
     if not file.filename:
-        return "Empty filename"
+        abort(400, description="Empty filename")
 
     allowed_extensions = {'txt', 'pdf', 'docx', 'doc'}
     if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in allowed_extensions):
-        return "Unsupported file type"
+        abort(400, description="Unsupported file type")
 
     return ""

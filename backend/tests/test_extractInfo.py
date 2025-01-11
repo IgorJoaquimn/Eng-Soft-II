@@ -43,6 +43,7 @@ Data: 15/12/2024
         self.assertEqual(result, expected_json)
 
     def test_getInfosFromText(self):
+        
         # Mocking GeminiGenerator.generate
         inputText = "Documento: Contrato de Aluguel\nData: 15/12/2024"
         llm.generate = MagicMock(return_value="""

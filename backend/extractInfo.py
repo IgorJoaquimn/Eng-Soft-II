@@ -1,4 +1,5 @@
 import re
+from flask import abort
 from GeminiGenerator import GeminiGenerator
 
 PROMPT = """
@@ -31,7 +32,13 @@ def treatResponse(response):
     return json
 
 def getInfosFromText(text):
-    prompt = injectTextOnPrompt(text)
-    response = llm.generate(prompt)
-    response = treatResponse(response)
-    return response
+
+    try:
+        prompt = injectTextOnPrompt(text)
+        response = llm.generate(prompt)
+        response = treatResponse(response)
+        return response
+
+    except Exception as e:
+        print(f"Error processing request: {e}")
+        abort(400, description="Error processing request")

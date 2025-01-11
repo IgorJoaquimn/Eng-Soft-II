@@ -11,13 +11,17 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/api/submit', methods=['POST'])
 def submit_data():
-    try:
-        return process_request(request) 
+        response = process_request(request)
+        print(response)
+        return response
 
-    except Exception as e:
-        print(traceback.format_exc())
-        print(f"Error processing request: {e}")
-        return jsonify({"error": str(e)}), 500
+@app.errorhandler(400)
+def handle_bad_request(error):
+    return jsonify({"error": error.description}), 400
+
+@app.errorhandler(500)
+def handle_internal_error(error):
+    return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

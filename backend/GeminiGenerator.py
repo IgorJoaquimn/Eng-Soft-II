@@ -1,4 +1,5 @@
 import os
+from flask import abort
 from dotenv import load_dotenv
 import google.generativeai as genai
 
@@ -13,6 +14,7 @@ class GeminiGenerator:
         
     def generate(self, prompt):
         try:
+            print(f"Gemini prompt: {prompt}")
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
@@ -21,8 +23,9 @@ class GeminiGenerator:
                     top_p=0.9
                 ),
             )
+            print(f"Gemini response: {response.text}")
             return response.text
-            
-        except:
-            print(f"Error making request to Google Gemini")
-            return None
+        
+        except Exception as e:
+            print(f"Error making request to Google Gemini: {e}")
+            abort(400, description="Invalid request")
