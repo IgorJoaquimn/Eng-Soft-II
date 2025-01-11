@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from flask import Flask
+from werkzeug.exceptions import BadRequest
+
 
 from utils import process_file, validate_file_input
 
@@ -31,7 +33,7 @@ class TestProcessFile(unittest.TestCase):
 
         # Assertions
         mock_file.save.assert_called_once_with("/mock/uploads/test_file.txt")
-        mock_open.assert_called_once_with("/mock/uploads/test_file.txt", 'r', encoding='UTF-8')
+        mock_open.assert_called_once_with("/mock/uploads/test_file.txt", 'r', encoding='UTF-8', errors='ignore')
 
     def test_no_file_received(self):
         # Test for no file in the request
@@ -41,10 +43,10 @@ class TestProcessFile(unittest.TestCase):
         # Create a Flask app context
         app = Flask(__name__)
         with app.app_context():
-            response = validate_file_input(mock_request)
+            with self.assertRaises(BadRequest) as context:
+                validate_file_input(mock_request)
 
-        # Assertions
-        self.assertEqual(response, "No file received")
+            self.assertEqual(context.exception.description, "No file received")
 
     def test_empty_filename(self):
         # Simulate the request with an empty filename
@@ -54,10 +56,10 @@ class TestProcessFile(unittest.TestCase):
         # Create a Flask app context
         app = Flask(__name__)
         with app.app_context():
-            response = validate_file_input(mock_request)
+            with self.assertRaises(BadRequest) as context:
+                validate_file_input(mock_request)
 
-        # Assertions
-        self.assertEqual(response, "Empty filename")
+            self.assertEqual(context.exception.description, "Empty filename")
 
     def test_unsupported_file_type(self):
         mock_request = MagicMock()
@@ -68,10 +70,10 @@ class TestProcessFile(unittest.TestCase):
         # Create a Flask app context
         app = Flask(__name__)
         with app.app_context():
-            response = validate_file_input(mock_request)
+            with self.assertRaises(BadRequest) as context:
+                validate_file_input(mock_request)
 
-        # Assertions
-        self.assertEqual(response, "Unsupported file type")
+            self.assertEqual(context.exception.description, "Unsupported file type")
     
     
 

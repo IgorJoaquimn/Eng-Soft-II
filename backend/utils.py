@@ -1,6 +1,7 @@
 import os
 from flask import jsonify, abort
 from extractInfo import getInfosFromText
+import pdfplumber
 
 UPLOAD_FOLDER = 'uploads'
 
@@ -22,16 +23,20 @@ def process_request(request):
     abort(400, description="Invalid request format")
 
 def process_file(request):
-
     file = request.files.get('file')
-
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
-    with open(filepath, 'r', encoding='UTF-8') as f:
-        content = f.read(1024 * 1024)
-
-        return content
+    if file.filename.lower().endswith('.pdf'):
+        with pdfplumber.open(filepath) as pdf:
+            content = ""
+            for page in pdf.pages:
+                content += page.extract_text() + "\n"
+    else:
+        with open(filepath, 'r', encoding='UTF-8', errors="ignore") as f:
+            content = f.read(1024 * 1024)
+    
+    return content
 
 def validate_file_input(request):
 

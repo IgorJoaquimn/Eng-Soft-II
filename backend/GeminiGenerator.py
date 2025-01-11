@@ -14,7 +14,7 @@ class GeminiGenerator:
         
     def generate(self, prompt):
         try:
-            print(f"Gemini prompt: {prompt}")
+            print(f"Sending prompt to Gemini API")
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
@@ -23,7 +23,7 @@ class GeminiGenerator:
                     top_p=0.9
                 ),
             )
-            print(f"Gemini response: {response.text}")
+            
             return response.text
         
         except Exception as e:
