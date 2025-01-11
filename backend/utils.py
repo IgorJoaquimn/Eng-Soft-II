@@ -9,7 +9,7 @@ def process_request(request):
     if request.files:
         error_message = validate_file_input(request)
         if error_message != "":
-            return jsonify({"error": error_message}), 400
+            abort(400, description=error_message)
 
         text = process_file(request)
         return jsonify(getInfosFromText(text))

@@ -28,4 +28,4 @@ class GeminiGenerator:
         
         except Exception as e:
             print(f"Error making request to Google Gemini: {e}")
-            abort(400, description="Invalid request")
+            abort(500, description="Invalid request")

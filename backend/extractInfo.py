@@ -41,4 +41,4 @@ def getInfosFromText(text):
 
     except Exception as e:
         print(f"Error processing request: {e}")
-        abort(400, description="Error processing request")
+        abort(500, description="Error processing request")
