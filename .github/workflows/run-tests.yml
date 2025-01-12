@@ -87,7 +87,7 @@ jobs:
       - name: Run Cypress Tests
         run: |
           cd frontend
-          npm run start:dev
+          npm run start:dev 
           npx cypress run --browser chrome
 
       - name: Upload Cypress Videos and Screenshots
