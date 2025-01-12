@@ -8,10 +8,10 @@ on:
     branches:
       - main
 
-  browser:
-        description: 'chrome'
-        required: false
-        default: 'chrome'
+browser:
+  description: 'chrome'
+  required: false
+  default: 'chrome'
 
 jobs:
   backend-tests:
