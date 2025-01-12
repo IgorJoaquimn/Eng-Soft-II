@@ -5,6 +5,7 @@ const textArea = document.getElementById('largeText');
 const fileInput = document.getElementById('fileUpload');
 const submitButton = document.getElementById('submitButton');
 const responseMessage = document.getElementById('responseMessage');
+const returnButton = document.getElementById('returnButton');
 
 document.addEventListener('DOMContentLoaded', () => {
     // Listen for input changes on textarea
@@ -24,6 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', function (event) {
         handleSubmit(event,textArea,fileInput,responseMessage);
     });
+
+    if (returnButton) {
+        returnButton.addEventListener('click', returnHome);
+    }
+
 });
 
 const MAX_TEXT_LENGTH = 5000; // Example: 5000 characters max
@@ -154,7 +160,7 @@ async function submitTextToApi(formData) {
         }
 
         const data = await response.json();
-        showMessage("Submitted successfully!", "alert-success");
+        showMessage(responseMessage,"Submitted successfully!", "alert-success");
         displayDataInTable(JSON.parse(data));
         textArea.value = "";
         fileInput.value = "";
@@ -279,6 +285,7 @@ function returnHome() {
     const responseContainer = document.getElementById('responseContainer');
     if (responseContainer) {
         responseContainer.remove();
+        responseMessage.remove();
     }
     form.style.display = 'block';
 }
