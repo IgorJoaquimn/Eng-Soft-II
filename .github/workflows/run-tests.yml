@@ -61,7 +61,7 @@ jobs:
         run: |
           cd frontend
           npm test
-
+  
   cypress-tests:
     name: Cypress Tests
     runs-on: ubuntu-latest
@@ -84,24 +84,12 @@ jobs:
           cd frontend
           npm install cypress --save-dev
 
-      - name: Run server
-        run: |
-          cd frontend
-          npm run start:dev
-
-      - name: Start Server in Background
-        run: |
-          cd frontend
-          npm run start:dev &
-        env:
-          CI: true
-
-      - name: Run Cypress Tests
-        run: |
-          cd frontend
-          npx cypress run --browser chrome
-        env:
-          CI: true
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm install
+          start: npm start:dev
+          browser: chrome
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
