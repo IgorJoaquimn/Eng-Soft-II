@@ -87,9 +87,12 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          project: ./frontend
-          build: npm install
-          start: npm start:dev
+          build: |
+                cd frontend
+                npm install
+          start: |
+                cd frontend 
+                npm start:dev
           browser: chrome
           wait-on: "http://localhost:3000"
 
