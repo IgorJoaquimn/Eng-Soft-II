@@ -84,7 +84,7 @@ jobs:
         with:
           project: ./frontend
           browser: chrome  # Set the desired browser
-          start: npm run start:dev
+          start: cd frontend, npm run start:dev
           wait-on: "http://localhost:3000"
 
       - name: Upload Cypress Videos and Screenshots
