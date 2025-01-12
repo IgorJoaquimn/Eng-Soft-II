@@ -92,9 +92,6 @@ jobs:
           build: npm install
           start: npm run start:dev
           wait-on: "http://localhost:3000"
-        run: |
-          cd frontend
-          npx cypress run
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
