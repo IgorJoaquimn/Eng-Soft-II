@@ -65,6 +65,9 @@ jobs:
   cypress-tests:
     name: Cypress Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -76,21 +79,17 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: |
-          cd frontend
           npm install
 
       - name: Install Cypress
         run: |
-          cd frontend
           npm install cypress --save-dev
 
       - name: Run Cypress Tests
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v6
         with:
-          command: |
-                  cd frontend
-                  npm run start:dev
-                  npx cypress run
+          project: ./frontend
+          start: npm run start:dev
           browser: chrome
 
       - name: Upload Cypress Videos and Screenshots
