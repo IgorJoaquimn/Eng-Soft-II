@@ -1,0 +1,76 @@
+SERVICE AGREEMENT CONTRACT
+
+Document Type: Professional Services Agreement
+Contract ID: PSA-2024-0123
+Date: January 15, 2024
+
+PARTIES:
+
+1. SERVICE PROVIDER:
+   Tech Solutions Inc.
+   Registration Number: C123456789
+   Address: 123 Business Plaza, Suite 400
+   New York, NY 10001
+   Representative: Sarah Johnson
+   Title: Director of Operations
+   Email: sarah.johnson@techsolutions.example
+   Phone: (555) 123-4567
+
+2. CLIENT:
+   Global Innovations Corp
+   Registration Number: GIC789012
+   Address: 456 Corporate Drive
+   Chicago, IL 60601
+   Representative: Michael Chen
+   Title: Chief Technology Officer
+   ID: SSN XXX-XX-4321
+   Email: m.chen@globalinnovations.example
+   Phone: (555) 987-6543
+
+AGREEMENT DETAILS:
+
+This Service Agreement ("Agreement") is entered into on the date specified above between Tech Solutions Inc. ("Provider") and Global Innovations Corp ("Client") for the provision of professional IT consulting services.
+
+PROJECT SCOPE:
+- Implementation of cloud infrastructure
+- Migration of legacy systems
+- Security assessment and upgrades
+- Staff training and documentation
+
+DURATION:
+Initial Term: 12 months
+Commencement Date: February 1, 2024
+Completion Date: January 31, 2025
+
+FINANCIAL TERMS:
+Contract Value: $250,000 USD
+Payment Schedule: Monthly installments of $20,833.33
+Payment Terms: Net 30
+
+ADDITIONAL DOCUMENTS REQUIRED:
+1. Certificate of Insurance
+2. Non-Disclosure Agreement
+3. Security Clearance Forms
+4. Professional Certifications
+
+This Agreement is executed by the authorized representatives of both parties as of the date first written above.
+
+SIGNATURES:
+
+_______________________
+Sarah Johnson
+Director of Operations
+Tech Solutions Inc.
+Date: January 15, 2024
+
+_______________________
+Michael Chen
+Chief Technology Officer
+Global Innovations Corp
+Date: January 15, 2024
+
+Witness:
+_______________________
+David Wilson
+Notary Public
+License: NY-NOT-98765
