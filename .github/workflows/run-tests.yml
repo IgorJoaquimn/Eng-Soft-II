@@ -65,31 +65,19 @@ jobs:
   cypress-tests:
     name: Cypress Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
         with:
-          node-version: '18'
-
-      - name: Install Frontend Dependencies
-        run: |
-          npm install
-
-      - name: Install Cypress
-        run: |
-          npm install cypress --save-dev
-
-      - name: Run Cypress Tests
-        uses: cypress-io/github-action@v2
-        with:
-          start: npm run start:dev
+          project: ./frontend
           browser: chrome
+          build: npm install
+          start: npm start:dev
+          wait-on: "http://localhost:3000"
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
