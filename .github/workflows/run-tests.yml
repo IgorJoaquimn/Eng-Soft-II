@@ -89,12 +89,19 @@ jobs:
           cd frontend
           npm run start:dev
 
-      - name: Run Cypress Tests
-        run: |
-          cd frontend
-          npx cypress run
-        env:
-          CI: true
+    - name: Start Server in Background
+      run: |
+        cd frontend
+        npm run start:dev &
+      env:
+        CI: true
+
+    - name: Run Cypress Tests
+      run: |
+        cd frontend
+        npx cypress run --browser chrome
+      env:
+        CI: true
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
