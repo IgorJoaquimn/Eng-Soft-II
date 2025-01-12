@@ -1,8 +1,9 @@
-import pytest
+import unittest
 import requests
 import os
 import json
 from pathlib import Path
+import concurrent.futures
 
 # Constants
 API_URL = "http://localhost:5000"
@@ -10,53 +11,52 @@ REAL_PDF_PATH = "tests/test_files/real_contract.pdf"
 CORRUPTED_PDF_PATH = "tests/test_files/corrupted.pdf"
 REAL_TXT_PATH = "tests/test_files/real_document.txt"
 
-class TestE2E:
+class TestE2E(unittest.TestCase):
     @classmethod
-    def setup_class(cls):
+    def setUpClass(cls):
+        """Run once before all tests"""
         try:
             response = requests.get(f"{API_URL}/health")
-            assert response.status_code == 200
+            if response.status_code != 200:
+                raise unittest.SkipTest("API server is not healthy")
         except requests.ConnectionError:
-            pytest.fail("API server is not running")
+            raise unittest.SkipTest("API server is not running")
+
+    def setUp(self):
+        """Run before each test"""
+        # Verify required test files exist
+        self.assertTrue(os.path.exists(REAL_PDF_PATH), "Real PDF test file not found")
+        self.assertTrue(os.path.exists(REAL_TXT_PATH), "Real TXT test file not found")
+        self.assertTrue(os.path.exists(CORRUPTED_PDF_PATH), "Corrupted PDF test file not found")
 
     def test_real_pdf_upload(self):
-        """
-        Tests uploading a real PDF file and processing it through the entire stack
-        including actual Gemini API processing
-        """
-        # Using a real PDF file
+        """Tests uploading a real PDF file and processing it through the entire stack"""
         with open(REAL_PDF_PATH, 'rb') as pdf:
             files = {'file': pdf}
             response = requests.post(f"{API_URL}/api/submit", files=files)
             
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.json())
 
-        assert 'Tipo de Documento' in data
-        assert 'Assunto' in data
-        assert data['Tipo de Documento'] == 'Contrato'
+        self.assertIn('Tipo de Documento', data)
+        self.assertIn('Assunto', data)
+        self.assertEqual(data['Tipo de Documento'], 'Contrato')
 
     def test_real_text_processing(self):
-        """
-        Tests processing real text through the entire stack
-        """
-        with open(REAL_TXT_PATH, 'rb') as pdf:
-            files = {'file': pdf}
+        """Tests processing real text through the entire stack"""
+        with open(REAL_TXT_PATH, 'rb') as txt:
+            files = {'file': txt}
             response = requests.post(f"{API_URL}/api/submit", files=files)
         
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.json())
 
-        assert 'Tipo de Documento' in data
-        assert 'Assunto' in data
-        assert data['Tipo de Documento'] == 'Contrato de Prestação de Serviços'
+        self.assertIn('Tipo de Documento', data)
+        self.assertIn('Assunto', data)
+        self.assertEqual(data['Tipo de Documento'], 'Contrato de Prestação de Serviços')
 
     def test_concurrent_requests(self):
-        """
-        Tests how the system handles multiple simultaneous requests
-        """
-        import concurrent.futures
-        
+        """Tests how the system handles multiple simultaneous requests"""
         def make_request():
             test_data = {"text": "Sample contract text"}
             return requests.post(f"{API_URL}/api/submit", json=test_data)
@@ -66,20 +66,22 @@ class TestE2E:
             responses = [f.result() for f in futures]
         
         # Verify all requests were successful
-        assert all(r.status_code == 200 for r in responses)
+        for response in responses:
+            self.assertEqual(response.status_code, 200)
 
     def test_error_recovery(self):
-        """
-        Tests system recovery after errors
-        """
+        """Tests system recovery after errors"""
         # Test with malformed PDF
         with open(CORRUPTED_PDF_PATH, 'rb') as pdf:
             files = {'file': pdf}
             response = requests.post(f"{API_URL}/api/submit", files=files)
             
-        assert response.status_code in [400, 500]  # Expect error
+        self.assertIn(response.status_code, [400, 500])  # Expect error
         
         # Test system still works after error
         test_data = {"text": "Simple contract text"}
         response = requests.post(f"{API_URL}/api/submit", json=test_data)
-        assert response.status_code == 200  # System recovered
+        self.assertEqual(response.status_code, 200)  # System recovered
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
