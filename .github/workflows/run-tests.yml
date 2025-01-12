@@ -86,9 +86,8 @@ jobs:
           npm install cypress --save-dev
 
       - name: Run Cypress Tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v2
         with:
-          project: ./frontend
           start: npm run start:dev
           browser: chrome
 
