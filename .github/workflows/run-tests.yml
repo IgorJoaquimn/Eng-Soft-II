@@ -84,6 +84,11 @@ jobs:
           cd frontend
           npm install cypress --save-dev
 
+      - name: Run server
+        run: |
+          cd frontend
+          npm run start:dev
+
       - name: Run Cypress Tests
         run: |
           cd frontend
