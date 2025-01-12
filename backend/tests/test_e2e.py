@@ -6,8 +6,9 @@ from pathlib import Path
 
 # Constants
 API_URL = "http://localhost:5000"
-REAL_PDF_PATH = "./test_files/real_contract.pdf"
-REAL_TXT_PATH = "./test_files/real_document.txt"
+REAL_PDF_PATH = "tests/test_files/real_contract.pdf"
+CORRUPTED_PDF_PATH = "tests/test_files/corrupted.pdf"
+REAL_TXT_PATH = "tests/test_files/real_document.txt"
 
 class TestE2E:
     @classmethod
@@ -72,7 +73,7 @@ class TestE2E:
         Tests system recovery after errors
         """
         # Test with malformed PDF
-        with open("test_files/corrupted.pdf", 'rb') as pdf:
+        with open(CORRUPTED_PDF_PATH, 'rb') as pdf:
             files = {'file': pdf}
             response = requests.post(f"{API_URL}/api/submit", files=files)
             
