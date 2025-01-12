@@ -14,7 +14,7 @@ class GeminiGenerator:
         
     def generate(self, prompt):
         try:
-            print(f"Sending prompt to Gemini API")
+            # print(f"Sending prompt to Gemini API")
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(

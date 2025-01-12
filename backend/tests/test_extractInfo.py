@@ -13,7 +13,7 @@ Data: 15/12/2024
 
     Dado o texto acima, extraia informações como Tipo de Documento, Assunto, Data, Localização, Empresa, Registro, Documentos, Nomes, Identificadores pessoais.
     Sempre que os dados forem de uma mesma entidade agrupe-os em uma mesma estrutura.
-    Você deve retornar um json contendo essas informações.
+    Você deve retornar um json contendo essas informações em Português do Brasil, independente da lingua do documento.
 """)
         result = injectTextOnPrompt(inputText)
         self.assertEqual(result, expected_prompt)
