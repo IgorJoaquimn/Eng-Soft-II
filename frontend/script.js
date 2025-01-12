@@ -283,7 +283,7 @@ function returnHome() {
     form.style.display = 'block';
 }
 
-module.exports =  {
+export {
     isInputEmpty,
     validateTextLength,
     updateSubmitState,

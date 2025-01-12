@@ -1,11 +1,11 @@
-const {
+import {
     isInputEmpty,
     validateTextLength,
     updateSubmitState,
     handleSubmit,
     showMessage,
     displayDataInTable,
-} = require('./script.js');
+} from './script.js';
 
 describe('Form Validation Tests', () => {
     let textArea, fileInput, submitButton, responseMessage, form;
