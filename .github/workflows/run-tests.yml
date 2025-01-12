@@ -8,11 +8,6 @@ on:
     branches:
       - main
 
-browser:
-  description: 'chrome'
-  required: false
-  default: 'chrome'
-
 jobs:
   backend-tests:
     name: Backend Tests
@@ -84,20 +79,13 @@ jobs:
           cd frontend
           npm install
 
-      - name: Install Cypress
-        run: |
-          cd frontend
-          npm install cypress --save-dev
-
-      - name: Start Server in Background
-        run: |
-          cd frontend
-          npm run start:dev 
-
-      - name: Run Cypress Tests
-        run: |
-          cd frontend
-          npx cypress run
+      - name: Run Cypress Tests with Chrome Browser
+        uses: cypress-io/github-action@v6
+        with:
+          project: ./frontend
+          browser: chrome  # Set the desired browser
+          start: npm run start:dev
+          wait-on: "http://localhost:3000"
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
