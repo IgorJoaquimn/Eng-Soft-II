@@ -85,13 +85,11 @@ jobs:
           npm install cypress --save-dev
 
       - name: Run Cypress Tests
-        uses: cypress-io/github-action@v3
-        with:
-          project: ./frontend
-          browser: chrome
-          build: npm install
-          start: npm run start:dev
-          wait-on: "http://localhost:3000"
+        run: |
+          cd frontend
+          npx cypress run
+        env:
+          CI: true
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
