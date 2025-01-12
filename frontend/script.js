@@ -121,7 +121,7 @@ function handleSubmit(event,textArea,fileInput,responseMessage){
         submitTextToApi(formData);
     }
     else {
-        showMessage("Some error occurred", "alert-danger");
+        showMessage(responseMessage, "Some error occurred", "alert-danger");
     }
 }
 
@@ -155,7 +155,7 @@ async function submitTextToApi(formData) {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: "Unknown error occurred" }));
-            showMessage(`Error: ${errorData.message || response.statusText}`, "alert-danger");
+            showMessage(responseMessage, `Error: ${errorData.message || response.statusText}`, "alert-danger");
             return;
         }
 
@@ -166,7 +166,7 @@ async function submitTextToApi(formData) {
         fileInput.value = "";
 
     } catch (error) {
-        showMessage(`Error: ${error.message}`, "alert-danger");
+        showMessage(responseMessage, `Error: ${error.message}`, "alert-danger");
     }
 }
 

@@ -62,6 +62,7 @@ jobs:
           cd frontend
           npm test
   
+  jobs:
   cypress-tests:
     name: Cypress Tests
     runs-on: ubuntu-latest
@@ -82,12 +83,13 @@ jobs:
       - name: Install Cypress
         run: |
           cd frontend
-          npm install cypress --save-dev
+          npm install cypress --save-dev wait-on
 
       - name: Start Server
         run: |
           cd frontend
-          npm run start:dev
+          npm run start:dev &
+          wait-on http://localhost:3000
 
       - name: Run Cypress Tests
         run: |
