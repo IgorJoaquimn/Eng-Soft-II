@@ -62,7 +62,7 @@ jobs:
           cd frontend
           npm test
   
-  cypress-tests:
+    cypress-tests:
     name: Cypress Tests
     runs-on: ubuntu-latest
     steps:
@@ -79,13 +79,16 @@ jobs:
           cd frontend
           npm install
 
-      - name: Run Cypress Tests with Chrome Browser
-        uses: cypress-io/github-action@v6
-        with:
-          project: ./frontend
-          browser: chrome  # Set the desired browser
-          start: cd frontend, npm run start:dev
-          wait-on: "http://localhost:3000"
+      - name: Install Cypress
+        run: |
+          cd frontend
+          npm install cypress --save-dev
+
+      - name: Run Cypress Tests
+        run: |
+          cd frontend
+          npm run start:dev
+          npx cypress run --browser chrome
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
