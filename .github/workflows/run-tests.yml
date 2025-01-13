@@ -89,7 +89,7 @@ jobs:
       - name: Setup .env file
         run: |
           touch .env
-          echo GEMINI_API_KEY=${{ secrets.API_KEY }} >> .env
+          echo GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} >> .env
           cat .env
 
       - name: Set up Python
