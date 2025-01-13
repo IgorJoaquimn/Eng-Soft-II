@@ -86,6 +86,12 @@ jobs:
           cd frontend
           npm run start:dev &    
 
+      - name: Setup .env file
+        run: |
+          touch .env
+          echo GEMINI_API_KEY=${{ secrets.API_KEY }} >> .env
+          cat .env
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
