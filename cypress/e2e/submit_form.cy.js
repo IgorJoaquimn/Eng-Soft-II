@@ -20,7 +20,7 @@ describe('Form Submission E2E Tests', () => {
         cy.intercept('POST', 'http://localhost:5000/api/submit').as('submitRequest');
 
         // Fill in the form and submit
-        cy.get('#largeText').type('Sample text for submission');
+        cy.get('#largeText').type('Teste de submissão');
         cy.get('#submitButton').click();
 
         // Wait for the API request and validate the response status
