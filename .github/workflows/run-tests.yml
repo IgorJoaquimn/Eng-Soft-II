@@ -106,7 +106,7 @@ jobs:
       - name: Run Backend Tests
         run: |
           cd backend
-          python server.py
+          python server.py &
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
