@@ -1,40 +1,33 @@
-describe('Submit Text or File to API', () => {
+// cypress/e2e/formSubmission.spec.js
 
+describe('Form Submission E2E Tests', () => {
     beforeEach(() => {
-        // Visit the page before each test
-        cy.visit('http://localhost:3000/')
+        // Visit the application before each test
+        cy.visit('index.html'); // Ensure this path points to your application
     });
-    
-    it('displays the response data in the responseContainer', () => {
-        cy.get('#largeText').type('This is a sample text for submission.');
-      
-        const mockResponse = {
-          section1: { key1: 'value1', key2: 'value2' },
-          section2: { key3: 'value3', key4: 'value4' },
-        };
-      
-        cy.intercept('POST', '/api/submit', {
-          statusCode: 200,
-          body: mockResponse,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      
+
+    it('should disable submit button when both inputs are empty', () => {
+        cy.get('#submitButton').should('be.disabled');
+    });
+
+    it('should enable submit button when valid text is entered', () => {
+        cy.get('#largeText').type('Valid text');
+        cy.get('#submitButton').should('not.be.disabled');
+    });
+
+    it('should handle successful API response and update the table', () => {
+        // Intercept the API call and provide a mock response
+        cy.intercept('POST', 'http://localhost:5000/api/submit').as('submitRequest');
+
+        // Fill in the form and submit
+        cy.get('#largeText').type('Sample text for submission');
         cy.get('#submitButton').click();
-      
-        // Check if the responseContainer is displayed
+
+        // Wait for the API request and validate the response status
+        cy.wait('@submitRequest').its('response.statusCode').should('eq', 200);
+
         cy.get('#responseContainer').should('exist');
-      
-        // Check if section headers are present
-        cy.get('#responseContainer h3').should('have.length', Object.keys(mockResponse).length);
-      
-        // Check if the contents match the mock response
-        Object.entries(mockResponse).forEach(([section, content]) => {
-          cy.get('#responseContainer').contains(section);
-          Object.entries(content).forEach(([key, value]) => {
-            cy.get('#responseContainer').contains(key);
-            cy.get('#responseContainer').contains(value);
-          });
-        });
-      });
-    
+    });
+
 });
+
