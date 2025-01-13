@@ -104,12 +104,14 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Backend Unix
+        if: runner.os != 'Windows'
         run: |
           cd backend
           nohup python server.py > backend.log 2>&1 &
         shell: bash
 
       - name: Run Backend Windows
+        if: runner.os == 'Windows'
         run: |
           cd backend
           start /B python server.py > backend.log 2>&1
