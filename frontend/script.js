@@ -161,7 +161,7 @@ async function submitTextToApi(formData) {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: "Unknown error occurred" }));
-            showMessage(responseMessage,`Error: ${errorData.message || response.statusText}`, "alert-danger");
+            showMessage(responseMessage,`Error2: ${errorData.message || response.statusText}`, "alert-danger");
             return;
         }
 
@@ -172,7 +172,7 @@ async function submitTextToApi(formData) {
         fileInput.value = "";
 
     } catch (error) {
-        showMessage(`Error: ${error.message}`, "alert-danger");
+        showMessage(responseMessage,`Error1: ${error.message}`, "alert-danger");
     } finally {
         // Re-enable the button after the request finishes
         if (submitButton) {
