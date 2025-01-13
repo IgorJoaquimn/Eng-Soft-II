@@ -129,6 +129,9 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        with:
+          wait-on: "http://localhost:3000"
+          
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
