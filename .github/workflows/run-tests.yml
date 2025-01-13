@@ -64,7 +64,10 @@ jobs:
   
   cypress-tests:
     name: Cypress Tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -81,7 +84,23 @@ jobs:
       - name: Start Server
         run: |
           cd frontend
-          npm run start:dev &          
+          npm run start:dev &    
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          python server.py
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
