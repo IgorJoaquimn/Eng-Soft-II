@@ -120,26 +120,37 @@ jobs:
           npm run start:dev &
         shell: bash
 
-      - name: Start Server Windows
+      - name: Start Server, Run Cypress Tests, and Upload Artifacts
         if: runner.os == 'Windows'
         run: |
+          # Navigate to the frontend directory
           cd frontend
+
+          # Start the server in the background
           start /B npm run start:dev
+
+          # Wait for the server to be accessible (wait for the server to start on port 3000)
+          echo "Waiting for the server to be available at http://localhost:3000"
+          timeout /t 30 /nobreak >nul
+          :waitForServer
+          curl --silent --head --fail http://localhost:3000 || (
+            echo "Server is not ready yet, retrying..."
+            timeout /t 5 /nobreak >nul
+            goto waitForServer
+          )
+          echo "Server is available, running Cypress tests..."
+
+          # Run Cypress tests
+          npx cypress run
+
+          # Upload Cypress artifacts if the tests fail
+          if %ERRORLEVEL% neq 0 (
+            echo "Cypress tests failed. Uploading artifacts..."
+            mkdir -p artifacts
+            copy frontend/cypress/videos/* artifacts/
+            copy frontend/cypress/screenshots/* artifacts/
+            # Upload the artifacts
+            echo "Uploading Cypress artifacts..."
+            curl -X POST -F "file=@artifacts/videos/" -F "file=@artifacts/screenshots/" https://uploads.github.com
+          )
         shell: cmd
-
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          wait-on: "http://localhost:3000"
-          install: false
-
-          
-
-      - name: Upload Cypress Videos and Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress-artifacts
-          path: |
-            frontend/cypress/videos/
-            frontend/cypress/screenshots/
