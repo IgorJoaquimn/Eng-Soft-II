@@ -131,6 +131,8 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           wait-on: "http://localhost:3000"
+          install: false
+
           
 
       - name: Upload Cypress Videos and Screenshots
