@@ -73,29 +73,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          npm install
-
-      - name: Start Server Unix
-        if: runner.os != 'Windows'
-        run: |
-          cd frontend
-          npm run start:dev &
-        shell: bash
-
-      - name: Start Server Windows
-        if: runner.os == 'Windows'
-        run: |
-          cd frontend
-          npx concurrently "npm run start:dev"
-        shell: cmd
-
       - name: Setup .env file
         run: |
           touch .env
@@ -125,6 +102,29 @@ jobs:
         run: |
           cd backend
           start /B python server.py > backend.log 2>&1
+        shell: cmd
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Start Server Unix
+        if: runner.os != 'Windows'
+        run: |
+          cd frontend
+          npm run start:dev &
+        shell: bash
+
+      - name: Start Server Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd frontend
+          start /B npm run start:dev
         shell: cmd
 
       - name: Cypress run
