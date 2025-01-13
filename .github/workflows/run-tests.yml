@@ -74,7 +74,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           project: ./frontend
-          build: npm 
+          build: npm install
           start: npm run start:dev
           browser: chrome
 
