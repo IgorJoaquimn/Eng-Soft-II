@@ -1,0 +1,22 @@
+{
+  "name": "eng-soft-ii",
+  "version": "1.0.0",
+  "description": "## Membros do Grupo - **Gabriel Franco Jallais** - **Henrique Daniel de Sousa** - **Igor Joaquim da Silva Costa**",
+  "homepage": "https://github.com/IgorJoaquimn/Eng-Soft-II#readme",
+  "bugs": {
+    "url": "https://github.com/IgorJoaquimn/Eng-Soft-II/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IgorJoaquimn/Eng-Soft-II.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cypress": "^13.17.0"
+  }
+}
