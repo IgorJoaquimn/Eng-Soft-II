@@ -148,14 +148,20 @@ function buildRequestFromFormData(formData) {
 }
 
 async function submitTextToApi(formData) {
+    // Disable the button at the start of the request
+    const submitButton = document.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Enviando...'; // Optionally change the button text
+    }
+
     try {
         const request = buildRequestFromFormData(formData);
-
         const response = await fetch('http://localhost:5000/api/submit', request);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: "Unknown error occurred" }));
-            showMessage(responseMessage, `Error: ${errorData.message || response.statusText}`, "alert-danger");
+            showMessage(responseMessage,`Error: ${errorData.message || response.statusText}`, "alert-danger");
             return;
         }
 
@@ -166,7 +172,13 @@ async function submitTextToApi(formData) {
         fileInput.value = "";
 
     } catch (error) {
-        showMessage(responseMessage, `Error: ${error.message}`, "alert-danger");
+        showMessage(`Error: ${error.message}`, "alert-danger");
+    } finally {
+        // Re-enable the button after the request finishes
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submeter'; // Reset the button text
+        }
     }
 }
 
