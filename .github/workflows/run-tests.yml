@@ -74,8 +74,12 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           project: ./frontend
-          build: npm install
-          start: npm run start:dev
+          build: | 
+              cd frontend
+              npm install
+          start: | 
+              cd frontend
+              npm run start:dev
           browser: chrome
 
       - name: Upload Cypress Videos and Screenshots
