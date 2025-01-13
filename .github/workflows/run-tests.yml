@@ -103,10 +103,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Backend
+      - name: Run Backend Unix
         run: |
           cd backend
           nohup python server.py > backend.log 2>&1 &
+        shell: bash
+
+      - name: Run Backend Windows
+        run: |
+          cd backend
+          start /B python server.py > backend.log 2>&1
+        shell: cmd
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
