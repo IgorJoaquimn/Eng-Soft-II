@@ -88,8 +88,7 @@ jobs:
           cd frontend
           # Start the server in the background
           npm run start:dev &
-          # Wait for the server to be ready (adjust the sleep time if needed)
-          sleep 10
+          cd ..
           # Run Cypress tests
           npx cypress run
         shell: bash
@@ -100,8 +99,7 @@ jobs:
           cd frontend
           # Start the server in the background
           start /B npm run start:dev
-          # Wait for the server to be ready (adjust the sleep time if needed)
-          timeout /t 10
+          cd ..
           # Run Cypress tests
           npx cypress run
         shell: cmd
