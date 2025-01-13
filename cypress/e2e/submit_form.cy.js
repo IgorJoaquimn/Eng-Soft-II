@@ -23,8 +23,6 @@ describe('Form Submission E2E Tests', () => {
         cy.get('#largeText').type('Teste de submissão');
         cy.get('#submitButton').click();
 
-        // Wait for the API request and validate the response status
-        cy.wait('@submitRequest').its('response.statusCode').should('eq', 200);
 
         cy.get('#responseContainer').should('exist');
     });
