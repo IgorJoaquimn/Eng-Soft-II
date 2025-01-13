@@ -81,10 +81,19 @@ jobs:
           cd frontend
           npm install
 
-      - name: Start Server
+      - name: Start Server Unix
+        if: runner.os != 'Windows'
         run: |
           cd frontend
-          npm run start:dev &    
+          npm run start:dev &
+        shell: bash
+
+      - name: Start Server Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd frontend
+          start /B npm run start:dev
+        shell: cmd
 
       - name: Setup .env file
         run: |
