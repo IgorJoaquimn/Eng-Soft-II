@@ -3,7 +3,7 @@
 describe('Form Submission E2E Tests', () => {
     beforeEach(() => {
         // Visit the application before each test
-        cy.visit('/frontend/index.html'); // Ensure this path points to your application
+        cy.visit('/index.html'); // Ensure this path points to your application
     });
 
     it('should disable submit button when both inputs are empty', () => {
