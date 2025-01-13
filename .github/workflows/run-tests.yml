@@ -8,16 +8,44 @@ on:
     branches:
       - main
 
-jobs:  
-  cypress-tests:
-    name: Cypress Tests
+jobs:
+  backend-tests:
+    name: Backend Tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          python -m unittest discover -s tests -p "*.py"
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -28,27 +56,84 @@ jobs:
         run: |
           cd frontend
           npm install
-          npx install cypress
 
+      - name: Run Frontend Tests
+        run: |
+          cd frontend
+          npm test
+  
+  cypress-tests:
+    name: Cypress Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Run Server and Cypress Tests (Unix)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Start Server Unix
         if: runner.os != 'Windows'
         run: |
           cd frontend
-          # Start the server in the background
           npm run start:dev &
-          cd ..
-          # Run Cypress tests
-          npx cypress run
         shell: bash
 
-      - name: Run Server and Cypress Tests (Windows)
+      - name: Start Server Windows
         if: runner.os == 'Windows'
         run: |
           cd frontend
-          # Start the server in the background
-          start /B npm run start:dev
-          cd ..
-          # Run Cypress tests
-          npx cypress run
+          npx concurrently "npm run start:dev"
         shell: cmd
+
+      - name: Setup .env file
+        run: |
+          touch .env
+          echo GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} >> .env
+          cat .env
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Backend Unix
+        if: runner.os != 'Windows'
+        run: |
+          cd backend
+          nohup python server.py > backend.log 2>&1 &
+        shell: bash
+
+      - name: Run Backend Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd backend
+          start /B python server.py > backend.log 2>&1
+        shell: cmd
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+
+      - name: Upload Cypress Videos and Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-artifacts
+          path: |
+            frontend/cypress/videos/
+            frontend/cypress/screenshots/
