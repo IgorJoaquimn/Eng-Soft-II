@@ -112,24 +112,11 @@ jobs:
           cd frontend
           npm install
 
-      - name: Start Server Unix
-        if: runner.os != 'Windows'
-        run: |
-          cd frontend
-          npm run start:dev &
-        shell: bash
-
-      - name: Start Server Windows
-        if: runner.os == 'Windows'
-        run: |
-          cd frontend
-          start /B npm run start:dev
-        shell: cmd
-
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
           wait-on: "http://localhost:3000"
+          start: npm run start:dev
           
 
       - name: Upload Cypress Videos and Screenshots
@@ -140,3 +127,4 @@ jobs:
           path: |
             frontend/cypress/videos/
             frontend/cypress/screenshots/
+
