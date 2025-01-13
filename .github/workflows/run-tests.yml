@@ -103,11 +103,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Backend Server
+      - name: Run Backend
         run: |
           cd backend
-          python server.py > backend.log 2>&1 &
-          disown
+          nohup python server.py > backend.log 2>&1 &
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
