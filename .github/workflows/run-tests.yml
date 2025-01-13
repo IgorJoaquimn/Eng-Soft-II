@@ -67,29 +67,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          npm install
-
-      - name: Start Server
-        run: |
-          cd frontend
-          npm run start:dev &    
-
       - name: Setup .env file
         run: |
           touch .env
-          echo GEMINI_API_KEY=${{ secrets.API_KEY }} >> .env
+          echo GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} >> .env
           cat .env
 
       - name: Set up Python
@@ -103,14 +89,48 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Backend Server
+      - name: Run Backend Unix
+        if: runner.os != 'Windows'
         run: |
           cd backend
-          python server.py > backend.log 2>&1 &
-          disown
+          nohup python server.py > backend.log 2>&1 &
+        shell: bash
+
+      - name: Run Backend Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd backend
+          start /B python server.py > backend.log 2>&1
+        shell: cmd
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Start Server Unix
+        if: runner.os != 'Windows'
+        run: |
+          cd frontend
+          npm run start:dev &
+        shell: bash
+
+      - name: Start Server Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd frontend
+          start /B npm run start:dev
+        shell: cmd
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        with:
+          wait-on: "http://localhost:3000"
+          
 
       - name: Upload Cypress Videos and Screenshots
         if: failure()
